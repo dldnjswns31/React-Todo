@@ -47,8 +47,10 @@ table {
 	border-spacing: 0;
 }
 body {
-	font-family: 'Source Sans Pro', sans-serif;
+font-weight: 300;
+font-family: 'Source Sans Pro', sans-serif;
   background-color: ${({ theme }) => theme.bgColor};
-  color: ${({ theme }) => theme.textColor};
+  color: black;
+  line-height: 1.2;
 }
 `;

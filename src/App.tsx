@@ -1,64 +1,67 @@
 import React from "react";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "@hello-pangea/dnd";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
-import { toDoState } from "./recoil/atoms";
-import DragabbleCard from "./components/DragabbleCard";
+import { IToDoState, toDoState } from "./recoil/atoms";
+import Board from "./components/Board";
 
 const StWrapper = styled.div`
   display: flex;
-  max-width: 480px;
-  width: 100%;
-  margin: 0 auto;
   justify-content: center;
   align-items: center;
+  width: 100vw;
   height: 100vh;
+  margin: 0 auto;
 `;
 
 const StBoards = styled.div`
-  display: grid;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   width: 100%;
-  grid-template-columns: repeat(1, 1fr);
-`;
-
-const StBoard = styled.div`
-  min-height: 200px;
-  padding: 20px 10px;
-  padding-top: 30px;
-  background-color: ${({ theme }) => theme.boardColor};
+  gap: 10px;
 `;
 
 function App() {
-  const [toDos, setToDos] = useRecoilState(toDoState);
-  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
-    // 제 자리에 둘 경우 destination이 없음.
+  const [toDos, setToDos] = useRecoilState<IToDoState>(toDoState);
+  const onDragEnd = (info: DropResult) => {
+    console.log(info);
+    const { destination, draggableId, source } = info;
     if (!destination) return;
-    setToDos((oldToDos) => {
-      const toDosCopy = [...oldToDos];
-      toDosCopy.splice(source.index, 1);
-      toDosCopy.splice(destination?.index, 0, draggableId);
-      return toDosCopy;
-    });
+
+    // 같은 보드 내에서 이동
+    if (destination?.droppableId === source.droppableId) {
+      setToDos((allBoards) => {
+        const boardCopy = [...allBoards[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination.index, 0, draggableId);
+        return { ...allBoards, [source.droppableId]: boardCopy };
+      });
+    }
+
+    // 다른 보드 이동
+    if (destination?.droppableId !== source.droppableId) {
+      setToDos((allBoards) => {
+        const sourceBoardCopy = [...allBoards[source?.droppableId]];
+        const destinationBoardCopy = [...allBoards[destination?.droppableId]];
+
+        sourceBoardCopy.splice(source.index, 1);
+        destinationBoardCopy.splice(destination.index, 0, draggableId);
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoardCopy,
+          [destination.droppableId]: destinationBoardCopy,
+        };
+      });
+    }
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <StWrapper>
         <StBoards>
-          <Droppable droppableId="one">
-            {(provided) => (
-              <StBoard ref={provided.innerRef} {...provided.droppableProps}>
-                {toDos.map((toDo, index) => (
-                  <DragabbleCard key={toDo} index={index} toDo={toDo} />
-                ))}
-                {provided.placeholder}
-              </StBoard>
-            )}
-          </Droppable>
+          {Object.keys(toDos).map((boardId) => (
+            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
+          ))}
         </StBoards>
       </StWrapper>
     </DragDropContext>

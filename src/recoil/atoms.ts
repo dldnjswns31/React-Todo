@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-export const myAtom = atom({
-  key: "atom",
-  default: 0,
+export const toDoState = atom({
+  key: "todo",
+  default: ["a", "b", "c", "d", "e", "f", "g"],
 });

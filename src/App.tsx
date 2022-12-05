@@ -25,7 +25,6 @@ const StBoards = styled.div`
 function App() {
   const [toDos, setToDos] = useRecoilState<IToDoState>(toDoState);
   const onDragEnd = (info: DropResult) => {
-    console.log(info);
     const { destination, draggableId, source } = info;
     if (!destination) return;
 

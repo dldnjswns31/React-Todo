@@ -4,10 +4,11 @@ import styled from "styled-components";
 import DragabbleCard from "./DragabbleCard";
 
 const StBoard = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 300px;
   min-height: 300px;
-  padding: 20px 10px;
-  padding-top: 10px;
+  padding: 10px 0px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
 `;
@@ -16,6 +17,23 @@ const StTitle = styled.h2`
   font-weight: 600;
   margin-bottom: 10px;
   font-size: 18px;
+`;
+
+interface IStAreaProps {
+  isDraggingOver: boolean;
+  isDraggingFromThis: boolean;
+}
+
+const StArea = styled.div<IStAreaProps>`
+  padding: 20px;
+  background-color: ${({ isDraggingOver, isDraggingFromThis }) =>
+    isDraggingOver
+      ? "#dfe6e9"
+      : isDraggingFromThis
+      ? "#b2bec3"
+      : "transparent"};
+  flex-grow: 1;
+  transition: background-color 0.1s ease-in;
 `;
 
 interface IBoardProps {
@@ -28,13 +46,18 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
     <StBoard>
       <StTitle>{boardId}</StTitle>
       <Droppable droppableId={boardId}>
-        {(provided) => (
-          <div ref={provided.innerRef} {...provided.droppableProps}>
+        {(provided, snapshot) => (
+          <StArea
+            isDraggingOver={snapshot.isDraggingOver}
+            isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
             {toDos.map((toDo, index) => (
               <DragabbleCard key={toDo} index={index} toDo={toDo} />
             ))}
             {provided.placeholder}
-          </div>
+          </StArea>
         )}
       </Droppable>
     </StBoard>

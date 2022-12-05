@@ -27,25 +27,26 @@ function App() {
   const onDragEnd = (info: DropResult) => {
     const { destination, draggableId, source } = info;
     if (!destination) return;
+    console.log(info);
 
-    // 같은 보드 내에서 이동
-    if (destination?.droppableId === source.droppableId) {
+    if (destination.droppableId === source.droppableId) {
       setToDos((allBoards) => {
         const boardCopy = [...allBoards[source.droppableId]];
+        const taskObject = boardCopy[source.index];
         boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination.index, 0, draggableId);
+        boardCopy.splice(destination.index, 0, taskObject);
         return { ...allBoards, [source.droppableId]: boardCopy };
       });
     }
 
-    // 다른 보드 이동
     if (destination?.droppableId !== source.droppableId) {
       setToDos((allBoards) => {
-        const sourceBoardCopy = [...allBoards[source?.droppableId]];
-        const destinationBoardCopy = [...allBoards[destination?.droppableId]];
+        const sourceBoardCopy = [...allBoards[source.droppableId]];
+        const taskObject = sourceBoardCopy[source.index];
+        const destinationBoardCopy = [...allBoards[destination.droppableId]];
 
         sourceBoardCopy.splice(source.index, 1);
-        destinationBoardCopy.splice(destination.index, 0, draggableId);
+        destinationBoardCopy.splice(destination.index, 0, taskObject);
         return {
           ...allBoards,
           [source.droppableId]: sourceBoardCopy,

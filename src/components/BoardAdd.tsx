@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { HiPlus } from "react-icons/hi";
 import { GrFormClose } from "react-icons/gr";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { toDoState } from "../recoil/atoms";
 
 const StAddButton = styled.button`
@@ -42,7 +42,7 @@ const StModal = styled.div`
   background-color: ${({ theme }) => theme.boardColor};
   border-radius: 5px;
 
-  div {
+  > div {
     width: 100%;
     padding: 10px 0;
     margin-bottom: 35px;
@@ -81,32 +81,45 @@ const StCloseButton = styled.button`
   }
 `;
 
+const StError = styled.div`
+  width: 100%;
+  padding: 10px 20px;
+  margin-bottom: 35px;
+  background-color: ${({ theme }) => theme.boardColor};
+  border-radius: 5px 5px 0 0;
+  color: red;
+  font-size: 14px;
+  font-weight: 500;
+`;
+
 interface IForm {
   title: string;
 }
 
 const BoardAdd = () => {
-  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const { register, handleSubmit, setValue, formState } = useForm<IForm>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const setToDos = useSetRecoilState(toDoState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  console.log(formState);
 
   const handleButtonClick = () => {
     setIsModalOpen((prev) => !prev);
   };
 
   const onValid = ({ title }: IForm) => {
-    setToDos((allBoards) => {
-      const boardTitle = Object.keys(allBoards);
-      const newBoard = Object.assign(
-        {},
-        ...boardTitle.map((key) => ({ [key]: allBoards[key] })),
-        { [title]: [] }
-      );
-      console.log(newBoard);
-      return newBoard;
-    });
-    setValue("title", "");
-    setIsModalOpen((prev) => !prev);
+    if (!toDos[title]) {
+      setToDos((allBoards) => {
+        const boardTitle = Object.keys(allBoards);
+        const newBoard = Object.assign(
+          {},
+          ...boardTitle.map((key) => ({ [key]: allBoards[key] })),
+          { [title]: [] }
+        );
+        return newBoard;
+      });
+      setValue("title", "");
+      setIsModalOpen((prev) => !prev);
+    }
   };
 
   return (
@@ -130,7 +143,26 @@ const BoardAdd = () => {
             </StCloseButton>
             <div>보드 제목</div>
             <form onSubmit={handleSubmit(onValid)}>
-              <input {...register("title", { required: true })} autoFocus />
+              <input
+                {...register("title", {
+                  required: "내용을 입력해주세요",
+                  validate: {
+                    overlap: (value) => {
+                      const overlap = Boolean(toDos[value]);
+                      return overlap ? "이미 존재하는 보드입니다" : true;
+                    },
+                    startWithNumber: (value) => {
+                      const reg = /^\d.*/;
+                      const startWithNumber = value.match(reg);
+                      return startWithNumber
+                        ? "보드는 숫자 시작이 불가능합니다."
+                        : true;
+                    },
+                  },
+                })}
+                autoFocus
+              />
+              <StError>{formState.errors.title?.message}</StError>
             </form>
           </StModal>
         </StModalBackground>

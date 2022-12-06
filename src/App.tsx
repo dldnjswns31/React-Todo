@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useRecoilState } from "recoil";
 import { IToDoState, toDoState } from "./recoil/atoms";
 import Board from "./components/Board";
+import Trashcan from "./components/Trashcan";
 
 const StWrapper = styled.div`
   display: flex;
@@ -16,6 +17,7 @@ const StWrapper = styled.div`
 
 const StBoards = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
@@ -41,8 +43,18 @@ function App() {
 
         return newBoardObj;
       });
+      return;
     }
-    if (type === "board") {
+    if (type !== "container") {
+      if (destination.droppableId === "trashcan") {
+        setToDos((allBoards) => {
+          const boardCopy = [...allBoards[source.droppableId]];
+          boardCopy.splice(source.index, 1);
+          return { ...allBoards, [source.droppableId]: boardCopy };
+        });
+        return;
+      }
+
       if (destination.droppableId === source.droppableId) {
         setToDos((allBoards) => {
           const boardCopy = [...allBoards[source.droppableId]];
@@ -51,9 +63,10 @@ function App() {
           boardCopy.splice(destination.index, 0, taskObject);
           return { ...allBoards, [source.droppableId]: boardCopy };
         });
+        return;
       }
 
-      if (destination?.droppableId !== source.droppableId) {
+      if (destination.droppableId !== source.droppableId) {
         setToDos((allBoards) => {
           const sourceBoardCopy = [...allBoards[source.droppableId]];
           const taskObject = sourceBoardCopy[source.index];
@@ -67,6 +80,7 @@ function App() {
             [destination.droppableId]: destinationBoardCopy,
           };
         });
+        return;
       }
     }
   };
@@ -94,6 +108,7 @@ function App() {
             );
           }}
         </Droppable>
+        <Trashcan />
       </StWrapper>
     </DragDropContext>
   );

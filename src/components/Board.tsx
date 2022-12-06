@@ -11,7 +11,7 @@ const StBoard = styled.div`
   flex-direction: column;
   width: 300px;
   min-height: 300px;
-  margin: 0 10px;
+  margin: 10px;
   padding: 10px 0px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
@@ -90,11 +90,11 @@ const Board = ({ toDos, boardId, index }: IBoardProps) => {
           <StForm onSubmit={handleSubmit(onValid)}>
             <input
               type="text"
-              placeholder={`Add task on ${boardId}`}
+              placeholder={`${boardId} 적기`}
               {...register("toDo", { required: true })}
             />
           </StForm>
-          <Droppable droppableId={boardId} type="board">
+          <Droppable droppableId={boardId}>
             {(provided, snapshot) => (
               <StArea
                 isDraggingOver={snapshot.isDraggingOver}

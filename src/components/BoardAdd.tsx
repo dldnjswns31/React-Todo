@@ -100,7 +100,6 @@ const BoardAdd = () => {
   const { register, handleSubmit, setValue, formState } = useForm<IForm>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toDos, setToDos] = useRecoilState(toDoState);
-  console.log(formState);
 
   const handleButtonClick = () => {
     setIsModalOpen((prev) => !prev);

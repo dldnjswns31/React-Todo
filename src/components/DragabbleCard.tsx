@@ -1,4 +1,4 @@
-import { Draggable } from "@hello-pangea/dnd";
+import { Draggable } from "react-beautiful-dnd";
 import React from "react";
 import styled from "styled-components";
 

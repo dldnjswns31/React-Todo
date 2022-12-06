@@ -1,5 +1,5 @@
 import React from "react";
-import { DragDropContext, DropResult } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
 import { IToDoState, toDoState } from "./recoil/atoms";
@@ -19,50 +19,81 @@ const StBoards = styled.div`
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  gap: 10px;
 `;
 
 function App() {
   const [toDos, setToDos] = useRecoilState<IToDoState>(toDoState);
   const onDragEnd = (info: DropResult) => {
-    const { destination, draggableId, source } = info;
+    const { destination, source, type } = info;
     if (!destination) return;
-    console.log(info);
-
-    if (destination.droppableId === source.droppableId) {
+    if (type === "container") {
       setToDos((allBoards) => {
-        const boardCopy = [...allBoards[source.droppableId]];
-        const taskObject = boardCopy[source.index];
-        boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination.index, 0, taskObject);
-        return { ...allBoards, [source.droppableId]: boardCopy };
+        const boardName = Object.keys(allBoards);
+        const draggedBoardName = boardName[source.index];
+
+        boardName.splice(source.index, 1);
+        boardName.splice(destination.index, 0, draggedBoardName);
+
+        const newBoardObj = Object.assign(
+          {},
+          ...boardName.map((key) => ({ [key]: allBoards[key] }))
+        );
+
+        return newBoardObj;
       });
     }
+    if (type === "board") {
+      if (destination.droppableId === source.droppableId) {
+        setToDos((allBoards) => {
+          const boardCopy = [...allBoards[source.droppableId]];
+          const taskObject = boardCopy[source.index];
+          boardCopy.splice(source.index, 1);
+          boardCopy.splice(destination.index, 0, taskObject);
+          return { ...allBoards, [source.droppableId]: boardCopy };
+        });
+      }
 
-    if (destination?.droppableId !== source.droppableId) {
-      setToDos((allBoards) => {
-        const sourceBoardCopy = [...allBoards[source.droppableId]];
-        const taskObject = sourceBoardCopy[source.index];
-        const destinationBoardCopy = [...allBoards[destination.droppableId]];
+      if (destination?.droppableId !== source.droppableId) {
+        setToDos((allBoards) => {
+          const sourceBoardCopy = [...allBoards[source.droppableId]];
+          const taskObject = sourceBoardCopy[source.index];
+          const destinationBoardCopy = [...allBoards[destination.droppableId]];
 
-        sourceBoardCopy.splice(source.index, 1);
-        destinationBoardCopy.splice(destination.index, 0, taskObject);
-        return {
-          ...allBoards,
-          [source.droppableId]: sourceBoardCopy,
-          [destination.droppableId]: destinationBoardCopy,
-        };
-      });
+          sourceBoardCopy.splice(source.index, 1);
+          destinationBoardCopy.splice(destination.index, 0, taskObject);
+          return {
+            ...allBoards,
+            [source.droppableId]: sourceBoardCopy,
+            [destination.droppableId]: destinationBoardCopy,
+          };
+        });
+      }
     }
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <StWrapper>
-        <StBoards>
-          {Object.keys(toDos).map((boardId) => (
-            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
-          ))}
-        </StBoards>
+        <Droppable
+          droppableId="container"
+          direction="horizontal"
+          type="container"
+        >
+          {(provided) => {
+            return (
+              <StBoards ref={provided.innerRef} {...provided.droppableProps}>
+                {Object.keys(toDos).map((boardId, index) => (
+                  <Board
+                    boardId={boardId}
+                    key={boardId}
+                    toDos={toDos[boardId]}
+                    index={index}
+                  />
+                ))}
+                {provided.placeholder}
+              </StBoards>
+            );
+          }}
+        </Droppable>
       </StWrapper>
     </DragDropContext>
   );

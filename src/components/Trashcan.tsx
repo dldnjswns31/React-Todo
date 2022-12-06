@@ -18,11 +18,23 @@ const trashcanShake = keyframes`
     }
 `;
 
-const StWrapper = styled.div<{ isDraggingOver: boolean }>`
+const StWrapper = styled.div`
   position: absolute;
   right: 50px;
   bottom: 50px;
   display: flex;
+  align-items: center;
+
+  span {
+    margin-right: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+  }
+`;
+
+const StTrashcan = styled.div<{ isDraggingOver: boolean }>`
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   width: 64px;
@@ -49,12 +61,15 @@ const Trashcan = () => {
     <Droppable droppableId="trashcan">
       {(provided, snapshot) => {
         return (
-          <StWrapper
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            isDraggingOver={snapshot.isDraggingOver}
-          >
-            <BsTrash2Fill />
+          <StWrapper>
+            <span>삭제할 카드는 여기 버려주세요!</span>
+            <StTrashcan
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              isDraggingOver={snapshot.isDraggingOver}
+            >
+              <BsTrash2Fill />
+            </StTrashcan>
           </StWrapper>
         );
       }}

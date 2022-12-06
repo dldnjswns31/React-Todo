@@ -5,8 +5,10 @@ import { useRecoilState } from "recoil";
 import { IToDoState, toDoState } from "./recoil/atoms";
 import Board from "./components/Board";
 import Trashcan from "./components/Trashcan";
+import BoardAdd from "./components/BoardAdd";
 
 const StWrapper = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -87,6 +89,7 @@ function App() {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <StWrapper>
+        <BoardAdd />
         <Droppable
           droppableId="container"
           direction="horizontal"

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import DragabbleCard from "./DragabbleCard";
+import { GrFormClose } from "react-icons/gr";
 import { ITodo, toDoState } from "../recoil/atoms";
 import { useSetRecoilState } from "recoil";
 
@@ -11,16 +12,46 @@ const StBoard = styled.div`
   flex-direction: column;
   width: 300px;
   min-height: 300px;
+  max-height: 600px;
   margin: 10px;
-  padding: 10px 0px;
+  padding-bottom: 10px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
-const StTitle = styled.h2`
-  text-align: center;
-  font-weight: 600;
+const StTitle = styled.div`
+  position: sticky;
+  top: 0;
+  padding: 10px 0;
   margin-bottom: 10px;
-  font-size: 18px;
+  background-color: white;
+  h2 {
+    text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+  }
+`;
+
+const StCloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  width: 20px;
+  height: 20px;
+  background-color: #ff7979;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `;
 
 interface IStAreaProps {
@@ -65,6 +96,7 @@ interface IForm {
 const Board = ({ toDos, boardId, index }: IBoardProps) => {
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const setToDos = useSetRecoilState(toDoState);
+
   const onValid = ({ toDo }: IForm) => {
     const newToDo = {
       id: Date.now(),
@@ -78,6 +110,15 @@ const Board = ({ toDos, boardId, index }: IBoardProps) => {
     });
     setValue("toDo", "");
   };
+
+  const handleCloseClick = () => {
+    setToDos((allBoards) => {
+      const boardCopy = { ...allBoards };
+      delete boardCopy[boardId];
+      return boardCopy;
+    });
+  };
+
   return (
     <Draggable draggableId={boardId} index={index}>
       {(provided) => (
@@ -86,7 +127,12 @@ const Board = ({ toDos, boardId, index }: IBoardProps) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <StTitle>{boardId}</StTitle>
+          <StTitle>
+            <StCloseButton onClick={handleCloseClick}>
+              <GrFormClose color="white" />
+            </StCloseButton>
+            <h2>{boardId}</h2>
+          </StTitle>
           <StForm onSubmit={handleSubmit(onValid)}>
             <input
               type="text"

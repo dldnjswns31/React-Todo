@@ -41,10 +41,14 @@ const StArea = styled.div<IStAreaProps>`
 
 const StForm = styled.form`
   width: 100%;
+  padding: 0px 20px;
 `;
 
 const StInput = styled.input`
   width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
 `;
 
 interface IBoardProps {

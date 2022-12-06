@@ -1,7 +1,22 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { BsTrash2Fill } from "react-icons/bs";
+
+const trashcanShake = keyframes`
+    25% {
+        transform: rotate(10deg);
+    }
+    50% {
+        transform: rotate(0);
+    }
+    75% {
+        transform: rotate(-10deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
+`;
 
 const StWrapper = styled.div<{ isDraggingOver: boolean }>`
   position: absolute;
@@ -16,9 +31,17 @@ const StWrapper = styled.div<{ isDraggingOver: boolean }>`
   border-radius: 50%;
   font-size: 32px;
   color: #3f8cf2;
-  transition: all 0.2s ease-in;
+  transition: all 0.1s ease-in;
 
-  transform: ${({ isDraggingOver }) => (isDraggingOver ? "scale(2)" : "none")};
+  ${({ isDraggingOver }) =>
+    isDraggingOver
+      ? css`
+          animation: ${trashcanShake} 0.2s infinite alternate;
+          width: 128px;
+          height: 128px;
+          font-size: 64px;
+        `
+      : null}
 `;
 
 const Trashcan = () => {

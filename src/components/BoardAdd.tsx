@@ -86,8 +86,8 @@ interface IForm {
 }
 
 const BoardAdd = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { register, handleSubmit, setValue } = useForm<IForm>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const setToDos = useSetRecoilState(toDoState);
 
   const handleButtonClick = () => {
@@ -130,7 +130,7 @@ const BoardAdd = () => {
             </StCloseButton>
             <div>보드 제목</div>
             <form onSubmit={handleSubmit(onValid)}>
-              <input {...register("title", { required: true })} />
+              <input {...register("title", { required: true })} autoFocus />
             </form>
           </StModal>
         </StModalBackground>

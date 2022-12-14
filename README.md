@@ -33,3 +33,5 @@ npm start
 ### 숫자로 시작하는 카테고리 이름
 
 ## stack
+
+Frontend : React, Recoil, TypeScript, styled-components, react-beautiful-dnd, react-hook-form

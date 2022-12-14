@@ -22,7 +22,7 @@ const StBoards = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  width: 100%;
+  width: 80%;
 `;
 
 function App() {

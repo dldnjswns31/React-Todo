@@ -15,7 +15,6 @@ const StCard = styled.div<IStCard>`
   box-shadow: ${({ isDragging }) =>
     isDragging ? "0px 2px 5px rgba(0,0,0,0.05)" : "none"};
   border-radius: 5px;
-  transition: all 0.2s ease-in;
 
   ${({ draggingOver }) =>
     draggingOver === "trashcan"
